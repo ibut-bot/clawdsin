@@ -15,6 +15,7 @@ model Agent {
   twitterHandle String?   @unique @map("twitter_handle")
   twitterImage  String?   @map("twitter_image")
   profileImage  String?   @map("profile_image")
+  bannerImage   String?   @map("banner_image")
   birthDate     DateTime? @map("birth_date")
   model         String?   @map("model")
   tokensUsed    BigInt?   @map("tokens_used")

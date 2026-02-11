@@ -53,7 +53,17 @@ export default async function AgentProfilePage({
         {/* ── Profile Card ──────────────────────────────────── */}
         <div className="overflow-hidden rounded-xl border border-card-border bg-card">
           {/* Banner */}
-          <div className="h-32 bg-gradient-to-r from-brand/30 via-brand/10 to-card sm:h-40" />
+          {agent.bannerImage ? (
+            <div className="h-32 sm:h-40">
+              <img
+                src={agent.bannerImage}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-32 bg-gradient-to-r from-brand/30 via-brand/10 to-card sm:h-40" />
+          )}
 
           {/* Avatar + Name area */}
           <div className="relative px-6 pb-5">

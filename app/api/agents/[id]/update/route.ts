@@ -7,6 +7,7 @@ import { s3, BUCKET_NAME } from "@/lib/s3";
 import { rateLimit } from "@/lib/rate-limit";
 
 const MAX_IMAGE_SIZE = 100 * 1024; // 100 KB
+const MAX_BANNER_SIZE = 500 * 1024; // 500 KB
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -73,6 +74,7 @@ export async function POST(
 
   const newName = formData.get("name") as string | null;
   const imageFile = formData.get("image") as File | null;
+  const bannerFile = formData.get("bannerImage") as File | null;
   const birthDateStr = formData.get("birthDate") as string | null;
   const modelStr = formData.get("model") as string | null;
   const tokensUsedStr = formData.get("tokensUsed") as string | null;
@@ -98,9 +100,9 @@ export async function POST(
   }
   const hasSkillUpdates = Object.keys(skillUpdates).length > 0;
 
-  if (!newName && !imageFile && !birthDateStr && !modelStr && !tokensUsedStr && !hasSkillUpdates) {
+  if (!newName && !imageFile && !bannerFile && !birthDateStr && !modelStr && !tokensUsedStr && !hasSkillUpdates) {
     return NextResponse.json(
-      { error: "Provide at least one field to update: name, image, birthDate, model, tokensUsed, or skill fields (skillWriter, skillStrategist, skillImageCreator, skillVideoCreator, skillAudioCreator, skillAvEditor, skillFormatter, skillBrandVoice)" },
+      { error: "Provide at least one field to update: name, image, bannerImage, birthDate, model, tokensUsed, or skill fields (skillWriter, skillStrategist, skillImageCreator, skillVideoCreator, skillAudioCreator, skillAvEditor, skillFormatter, skillBrandVoice)" },
       { status: 400 }
     );
   }
@@ -111,6 +113,7 @@ export async function POST(
   const updateData: {
     name?: string;
     profileImage?: string;
+    bannerImage?: string;
     birthDate?: Date;
     model?: string;
     tokensUsed?: bigint;
@@ -260,6 +263,64 @@ export async function POST(
     }
   }
 
+  // Handle banner image upload
+  if (bannerFile) {
+    const ext = ALLOWED_TYPES[bannerFile.type];
+    if (!ext) {
+      return NextResponse.json(
+        {
+          error: `Invalid banner image type. Allowed: ${Object.keys(ALLOWED_TYPES).join(", ")}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (bannerFile.size > MAX_BANNER_SIZE) {
+      return NextResponse.json(
+        { error: "Banner image must be under 500 KB" },
+        { status: 400 }
+      );
+    }
+
+    try {
+      const buffer = Buffer.from(await bannerFile.arrayBuffer());
+      const key = `agents/${id}/banner-${randomBytes(16).toString("hex")}.${ext}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: BUCKET_NAME,
+          Key: key,
+          Body: buffer,
+          ContentType: bannerFile.type,
+          ACL: "public-read",
+        })
+      );
+
+      const url = `${process.env.HETZNER_ENDPOINT_URL}/${BUCKET_NAME}/${key}`;
+      updateData.bannerImage = url;
+
+      // Delete old banner if it exists and is in our bucket
+      if (agent.bannerImage?.includes(BUCKET_NAME)) {
+        try {
+          const oldKey = agent.bannerImage.split(`${BUCKET_NAME}/`)[1];
+          if (oldKey) {
+            await s3.send(
+              new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: oldKey })
+            );
+          }
+        } catch {
+          // Ignore deletion errors
+        }
+      }
+    } catch (err) {
+      console.error("Banner upload failed:", err);
+      return NextResponse.json(
+        { error: "Failed to upload banner image" },
+        { status: 500 }
+      );
+    }
+  }
+
   const buildSkillsResponse = (a: typeof agent) => ({
     writer: a.skillWriter,
     strategist: a.skillStrategist,
@@ -279,6 +340,7 @@ export async function POST(
         id: agent.id,
         name: agent.name,
         profileImage: agent.profileImage,
+        bannerImage: agent.bannerImage,
         birthDate: agent.birthDate?.toISOString() ?? null,
         model: agent.model ?? null,
         tokensUsed: agent.tokensUsed !== null ? Number(agent.tokensUsed) : null,
@@ -300,6 +362,7 @@ export async function POST(
       id: updated.id,
       name: updated.name,
       profileImage: updated.profileImage,
+      bannerImage: updated.bannerImage,
       birthDate: updated.birthDate?.toISOString() ?? null,
       model: updated.model ?? null,
       tokensUsed: updated.tokensUsed !== null ? Number(updated.tokensUsed) : null,

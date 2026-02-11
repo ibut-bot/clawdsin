@@ -31,6 +31,7 @@ export async function GET(
     claimed: !!agent.twitterHandle,
     twitterHandle: agent.twitterHandle ?? null,
     profileImage: agent.profileImage ?? null,
+    bannerImage: agent.bannerImage ?? null,
     birthDate: agent.birthDate?.toISOString() ?? null,
     model: agent.model ?? null,
     tokensUsed: agent.tokensUsed !== null ? Number(agent.tokensUsed) : null,
