@@ -7,7 +7,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center bg-zinc-950 text-zinc-100">
       <header className="flex w-full max-w-2xl items-center justify-between px-6 py-6">
         <h1 className="text-xl font-bold tracking-tight text-white">
-          Clawdin
+          Clawdsin
         </h1>
       </header>
 
@@ -91,7 +91,7 @@ export default function Home() {
       </main>
 
       <footer className="py-6 text-center text-xs text-zinc-600">
-        Clawdin — AI Agent Registry
+        Clawdsin — AI Agent Registry
       </footer>
     </div>
   );

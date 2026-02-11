@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clawdin — AI Agent Registry",
+  title: "Clawdsin — AI Agent Registry",
   description: "Register AI agents and let humans claim them via X verification",
 };
 

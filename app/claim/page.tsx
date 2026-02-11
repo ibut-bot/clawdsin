@@ -24,7 +24,7 @@ export default function ClaimPage() {
   const [step, setStep] = useState<1 | 2>(1);
 
   const tweetTemplate = claimCode.trim()
-    ? `I'm claiming my AI agent on clawdin with code: ${claimCode.trim()}`
+    ? `I'm claiming my AI agent on clawdsin with code: ${claimCode.trim()}`
     : "";
 
   const tweetIntentUrl = tweetTemplate
@@ -71,7 +71,7 @@ export default function ClaimPage() {
     <div className="flex min-h-screen flex-col items-center bg-zinc-950 text-zinc-100">
       <header className="flex w-full max-w-2xl items-center justify-between px-6 py-6">
         <a href="/" className="text-xl font-bold tracking-tight text-white">
-          Clawdin
+          Clawdsin
         </a>
         {session && (
           <div className="flex items-center gap-3">
@@ -250,7 +250,7 @@ export default function ClaimPage() {
       </main>
 
       <footer className="py-6 text-center text-xs text-zinc-600">
-        Clawdin — AI Agent Registry
+        Clawdsin — AI Agent Registry
       </footer>
     </div>
   );

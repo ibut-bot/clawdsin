@@ -15,7 +15,7 @@ export default async function AgentProfilePage({
     <div className="flex min-h-screen flex-col items-center bg-zinc-950 text-zinc-100">
       <header className="flex w-full max-w-2xl items-center justify-between px-6 py-6">
         <a href="/" className="text-xl font-bold tracking-tight text-white">
-          Clawdin
+          Clawdsin
         </a>
       </header>
 
@@ -135,7 +135,7 @@ export default async function AgentProfilePage({
             { key: "skillFormatter", label: "Formatter", desc: "Platform-specific output packaging" },
             { key: "skillBrandVoice", label: "Brand Voice", desc: "Style guide adherence, voice matching" },
           ] as const;
-          const hasAny = skills.some((s) => agent[s.key]);
+          const hasAny = skills.some((s) => agent[s.key] > 0);
           return (
             <div className="mt-8 w-full max-w-sm">
               <h2 className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
@@ -144,24 +144,42 @@ export default async function AgentProfilePage({
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
                 <table className="w-full text-sm">
                   <tbody>
-                    {skills.map((s, i) => (
-                      <tr
-                        key={s.key}
-                        className={i < skills.length - 1 ? "border-b border-zinc-800/50" : ""}
-                      >
-                        <td className="px-4 py-2.5">
-                          <span className="text-zinc-200">{s.label}</span>
-                          <span className="ml-2 text-xs text-zinc-600">{s.desc}</span>
-                        </td>
-                        <td className="px-4 py-2.5 text-right">
-                          {agent[s.key] ? (
-                            <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" title="Yes" />
-                          ) : (
-                            <span className="inline-block h-2 w-2 rounded-full bg-zinc-700" title="No" />
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {skills.map((s, i) => {
+                      const level = agent[s.key] as number;
+                      return (
+                        <tr
+                          key={s.key}
+                          className={i < skills.length - 1 ? "border-b border-zinc-800/50" : ""}
+                        >
+                          <td className="px-4 py-2.5 w-28">
+                            <span className="text-zinc-200 text-xs font-medium">{s.label}</span>
+                          </td>
+                          <td className="px-2 py-2.5">
+                            <div className="flex items-center gap-2">
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: 10 }, (_, j) => (
+                                  <div
+                                    key={j}
+                                    className={`h-2.5 w-1.5 rounded-sm ${
+                                      j < level
+                                        ? level >= 8
+                                          ? "bg-emerald-400"
+                                          : level >= 5
+                                            ? "bg-amber-400"
+                                            : "bg-zinc-400"
+                                        : "bg-zinc-800"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-xs text-zinc-500 w-4 text-right">
+                                {level > 0 ? level : "—"}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -185,7 +203,7 @@ export default async function AgentProfilePage({
       </main>
 
       <footer className="py-6 text-center text-xs text-zinc-600">
-        Clawdin — AI Agent Registry
+        Clawdsin — AI Agent Registry
       </footer>
     </div>
   );

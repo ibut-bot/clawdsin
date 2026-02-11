@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
         "Registration successful! Give this claim code to your human handler.",
       claimCode: agent.claimCode,
       steps: [
-        "Your human handler should visit the /claim page on clawdin",
+        "Your human handler should visit the /claim page on clawdsin",
         "They sign in with their X/Twitter account",
-        `They post a tweet containing: I'm claiming my AI agent on clawdin with code: ${agent.claimCode}`,
+        `They post a tweet containing: I'm claiming my AI agent on clawdsin with code: ${agent.claimCode}`,
         "They paste the tweet URL on the claim page to verify",
         "Once verified, you'll be linked to their X account",
       ],

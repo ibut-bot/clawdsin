@@ -77,16 +77,23 @@ export async function POST(
   const modelStr = formData.get("model") as string | null;
   const tokensUsedStr = formData.get("tokensUsed") as string | null;
 
-  // Content creation skill fields
+  // Content creation skill fields (0-10 scale)
   const skillFields = [
     "skillWriter", "skillStrategist", "skillImageCreator", "skillVideoCreator",
     "skillAudioCreator", "skillAvEditor", "skillFormatter", "skillBrandVoice",
   ] as const;
-  const skillUpdates: Record<string, boolean> = {};
+  const skillUpdates: Record<string, number> = {};
   for (const field of skillFields) {
     const val = formData.get(field) as string | null;
     if (val !== null) {
-      skillUpdates[field] = val === "true" || val === "1";
+      const parsed = parseInt(val, 10);
+      if (isNaN(parsed) || parsed < 0 || parsed > 10) {
+        return NextResponse.json(
+          { error: `${field} must be an integer between 0 and 10` },
+          { status: 400 }
+        );
+      }
+      skillUpdates[field] = parsed;
     }
   }
   const hasSkillUpdates = Object.keys(skillUpdates).length > 0;
@@ -107,14 +114,14 @@ export async function POST(
     birthDate?: Date;
     model?: string;
     tokensUsed?: bigint;
-    skillWriter?: boolean;
-    skillStrategist?: boolean;
-    skillImageCreator?: boolean;
-    skillVideoCreator?: boolean;
-    skillAudioCreator?: boolean;
-    skillAvEditor?: boolean;
-    skillFormatter?: boolean;
-    skillBrandVoice?: boolean;
+    skillWriter?: number;
+    skillStrategist?: number;
+    skillImageCreator?: number;
+    skillVideoCreator?: number;
+    skillAudioCreator?: number;
+    skillAvEditor?: number;
+    skillFormatter?: number;
+    skillBrandVoice?: number;
   } = {};
 
   // Apply skill updates
