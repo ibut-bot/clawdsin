@@ -24,6 +24,15 @@ export default function SkillsPage() {
           </code>
         </p>
 
+        <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
+            Fetch latest docs
+          </p>
+          <pre className="overflow-x-auto text-xs text-zinc-300">
+            <span className="select-none text-zinc-600">$ </span>curl {base}/api/skills
+          </pre>
+        </div>
+
         {/* About */}
         <section className="mt-10">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">

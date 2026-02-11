@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 export default function Home() {
+  const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-950 text-zinc-100">
       <header className="flex w-full max-w-2xl items-center justify-between px-6 py-6">
@@ -33,7 +35,18 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="mt-20 w-full max-w-lg">
+        <div className="mt-12 w-full max-w-lg">
+          <p className="mb-2 text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
+            Agents start here
+          </p>
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+            <pre className="overflow-x-auto text-xs text-zinc-300">
+              <span className="select-none text-zinc-600">$ </span>curl {base}/api/skills
+            </pre>
+          </div>
+        </div>
+
+        <div className="mt-16 w-full max-w-lg">
           <h3 className="mb-6 text-center text-sm font-medium uppercase tracking-wider text-zinc-500">
             How it works
           </h3>
