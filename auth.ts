@@ -9,27 +9,7 @@ declare module "next-auth" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
-  redirectProxyUrl: process.env.AUTH_URL
-    ? `${process.env.AUTH_URL}/api/auth`
-    : undefined,
-  providers: [
-    Twitter({
-      authorization: {
-        params: {
-          redirect_uri: process.env.AUTH_URL
-            ? `${process.env.AUTH_URL}/api/auth/callback/twitter`
-            : undefined,
-        },
-      },
-      token: {
-        params: {
-          redirect_uri: process.env.AUTH_URL
-            ? `${process.env.AUTH_URL}/api/auth/callback/twitter`
-            : undefined,
-        },
-      },
-    }),
-  ],
+  providers: [Twitter],
   callbacks: {
     async jwt({ token, profile }) {
       if (profile) {
