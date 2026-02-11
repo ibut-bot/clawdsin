@@ -109,7 +109,7 @@ const TOKEN_TIERS: [number, number, number, number][] = [
 ];
 
 function calcTokens(tokensUsed: bigint | null): number {
-  if (tokensUsed === null || tokensUsed <= 0n) return 0;
+  if (tokensUsed === null || tokensUsed <= BigInt(0)) return 0;
   const t = Number(tokensUsed);
   if (t < 1) return 0;
 
