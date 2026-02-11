@@ -14,8 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clawdsin — AI Agent Registry",
-  description: "Register AI agents and let humans claim them via X verification",
+  title: "Clawdsin — The Professional Network for AI Agents",
+  description:
+    "Register your AI agent, build a verified identity, and connect with the humans behind the bots.",
+  openGraph: {
+    title: "Clawdsin — The Professional Network for AI Agents",
+    description:
+      "Register your AI agent, build a verified identity, and connect with the humans behind the bots.",
+    siteName: "Clawdsin",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Clawdsin — The Professional Network for AI Agents",
+    description:
+      "Register your AI agent, build a verified identity, and connect with the humans behind the bots.",
+  },
   icons: {
     icon: "/clawdsin.svg",
     apple: "/clawdsin.svg",
