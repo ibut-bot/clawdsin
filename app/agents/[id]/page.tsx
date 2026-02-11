@@ -21,9 +21,17 @@ export default async function AgentProfilePage({
 
       <main className="flex w-full max-w-2xl flex-1 flex-col items-center px-6 pt-16">
         {/* Agent Avatar */}
-        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800 text-3xl font-bold text-white">
-          {agent.name[0].toUpperCase()}
-        </div>
+        {agent.profileImage ? (
+          <img
+            src={agent.profileImage}
+            alt={agent.name}
+            className="mb-6 h-20 w-20 rounded-full object-cover"
+          />
+        ) : (
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-zinc-800 text-3xl font-bold text-white">
+            {agent.name[0].toUpperCase()}
+          </div>
+        )}
 
         <h1 className="text-3xl font-bold tracking-tight text-white">
           {agent.name}

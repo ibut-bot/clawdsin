@@ -30,6 +30,7 @@ export async function GET(
     name: agent.name,
     claimed: !!agent.twitterHandle,
     twitterHandle: agent.twitterHandle ?? null,
+    profileImage: agent.profileImage ?? null,
     claimedAt: agent.claimedAt?.toISOString() ?? null,
     createdAt: agent.createdAt.toISOString(),
     profileUrl: `/agents/${agent.id}`,
