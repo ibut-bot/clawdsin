@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getScoreRank } from "@/lib/score";
 
 export default async function AgentProfilePage({
   params,
@@ -11,6 +12,18 @@ export default async function AgentProfilePage({
   const agent = await prisma.agent.findUnique({ where: { id } });
 
   if (!agent) notFound();
+
+  // Compute leaderboard rank position for claimed agents with a score
+  let leaderboardRank: number | null = null;
+  if (agent.twitterHandle && agent.score !== null) {
+    const aheadCount = await prisma.agent.count({
+      where: {
+        twitterHandle: { not: null },
+        score: { not: null, gt: agent.score },
+      },
+    });
+    leaderboardRank = aheadCount + 1;
+  }
 
   const skills = [
     { key: "skillWriter", label: "Writer", desc: "Long-form, short-form, SEO, editing" },
@@ -33,6 +46,12 @@ export default async function AgentProfilePage({
             <img src="/clawdsin longform.svg" alt="Clawdsin" className="h-8" />
           </Link>
           <div className="flex items-center gap-1">
+            <Link
+              href="/leaderboard"
+              className="rounded-md px-3 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/5 hover:text-white"
+            >
+              Leaderboard
+            </Link>
             <Link
               href="/claim"
               className="rounded-md px-3 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/5 hover:text-white"
@@ -82,9 +101,56 @@ export default async function AgentProfilePage({
               )}
             </div>
 
-            {/* Name + headline */}
-            <h1 className="text-2xl font-bold text-white">{agent.name}</h1>
-            <p className="mt-0.5 text-base text-zinc-400">AI Agent</p>
+            {/* Name + headline + score */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-white">{agent.name}</h1>
+                <p className="mt-0.5 text-base text-zinc-400">AI Agent</p>
+              </div>
+
+              {/* Score badge — only for claimed agents with a score */}
+              {agent.twitterHandle && agent.score !== null && (
+                <div className="flex flex-col items-center gap-1">
+                  <div className="relative flex h-20 w-20 items-center justify-center">
+                    {/* Circular progress ring */}
+                    <svg className="absolute h-20 w-20 -rotate-90" viewBox="0 0 80 80">
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="34"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        className="text-zinc-800"
+                      />
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="34"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        strokeDasharray={`${(agent.score / 1000) * 213.6} 213.6`}
+                        strokeLinecap="round"
+                        className="text-brand"
+                      />
+                    </svg>
+                    <span className="text-lg font-bold text-white">{agent.score}</span>
+                  </div>
+                  <span className="text-xs font-semibold text-brand">
+                    {getScoreRank(agent.score)}
+                  </span>
+                  {leaderboardRank !== null && (
+                    <Link
+                      href="/leaderboard"
+                      className="text-[11px] text-zinc-500 transition hover:text-zinc-300"
+                    >
+                      #{leaderboardRank} on leaderboard
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Metadata row (like LinkedIn location / connections) */}
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500">
@@ -166,43 +232,6 @@ export default async function AgentProfilePage({
           </div>
         </div>
 
-        {/* ── About Card ────────────────────────────────────── */}
-        {agent.twitterHandle && (
-          <div className="mt-4 rounded-xl border border-card-border bg-card p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">About</h2>
-            <div className="flex items-center gap-4">
-              {agent.twitterImage && (
-                <img
-                  src={agent.twitterImage.replace("_normal", "_200x200")}
-                  alt={agent.twitterHandle ?? ""}
-                  className="h-14 w-14 rounded-full object-cover"
-                />
-              )}
-              <div>
-                <p className="text-sm text-zinc-400">Claimed by</p>
-                <a
-                  href={`https://x.com/${agent.twitterHandle}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base font-semibold text-white transition hover:text-brand"
-                >
-                  @{agent.twitterHandle}
-                </a>
-                {agent.claimedAt && (
-                  <p className="mt-0.5 text-xs text-zinc-500">
-                    Claimed on{" "}
-                    {new Date(agent.claimedAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* ── Skills Card ───────────────────────────────────── */}
         <div className="mt-4 rounded-xl border border-card-border bg-card p-6">
           <h2 className="mb-4 text-lg font-semibold text-white">
@@ -263,6 +292,7 @@ export default async function AgentProfilePage({
             Clawdsin — AI Agent Registry
           </div>
           <div className="flex items-center gap-4 text-xs text-zinc-600">
+            <Link href="/leaderboard" className="transition hover:text-zinc-300">Leaderboard</Link>
             <Link href="/claim" className="transition hover:text-zinc-300">Claim</Link>
             <Link href="/skills" className="transition hover:text-zinc-300">Docs</Link>
           </div>

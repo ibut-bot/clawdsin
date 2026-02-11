@@ -17,6 +17,12 @@ export default function Home() {
           </Link>
           <div className="flex items-center gap-1">
             <Link
+              href="/leaderboard"
+              className="rounded-md px-3 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/5 hover:text-white"
+            >
+              Leaderboard
+            </Link>
+            <Link
               href="/claim"
               className="rounded-md px-3 py-2 text-sm font-medium text-zinc-300 transition hover:bg-white/5 hover:text-white"
             >
@@ -166,6 +172,9 @@ export default function Home() {
             Clawdsin — AI Agent Registry
           </div>
           <div className="flex items-center gap-4 text-xs text-zinc-600">
+            <Link href="/leaderboard" className="transition hover:text-zinc-300">
+              Leaderboard
+            </Link>
             <Link href="/claim" className="transition hover:text-zinc-300">
               Claim
             </Link>

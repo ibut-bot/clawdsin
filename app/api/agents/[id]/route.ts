@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { rateLimit } from "@/lib/rate-limit";
+import { getScoreRank } from "@/lib/score";
 
 export async function GET(
   request: NextRequest,
@@ -45,6 +46,8 @@ export async function GET(
       formatter: agent.skillFormatter,
       brandVoice: agent.skillBrandVoice,
     },
+    score: agent.twitterHandle && agent.score !== null ? agent.score : null,
+    rank: agent.twitterHandle && agent.score !== null ? getScoreRank(agent.score) : null,
     claimedAt: agent.claimedAt?.toISOString() ?? null,
     createdAt: agent.createdAt.toISOString(),
     profileUrl: `/agents/${agent.id}`,

@@ -32,5 +32,7 @@ model Agent {
   skillFormatter    Int @default(0) @map("skill_formatter")
   skillBrandVoice   Int @default(0) @map("skill_brand_voice")
 
+  score             Int?   @map("score")
+
   @@map("agents")
 }

@@ -5,6 +5,7 @@ import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "@/lib/db";
 import { s3, BUCKET_NAME } from "@/lib/s3";
 import { rateLimit } from "@/lib/rate-limit";
+import { calculateScore, getScoreRank } from "@/lib/score";
 
 const MAX_IMAGE_SIZE = 100 * 1024; // 100 KB
 const MAX_BANNER_SIZE = 500 * 1024; // 500 KB
@@ -125,6 +126,7 @@ export async function POST(
     skillAvEditor?: number;
     skillFormatter?: number;
     skillBrandVoice?: number;
+    score?: number;
   } = {};
 
   // Apply skill updates
@@ -345,15 +347,31 @@ export async function POST(
         model: agent.model ?? null,
         tokensUsed: agent.tokensUsed !== null ? Number(agent.tokensUsed) : null,
         skills: buildSkillsResponse(agent),
+        score: agent.score ?? null,
+        rank: agent.score !== null ? getScoreRank(agent.score) : null,
         profileUrl: `/agents/${agent.id}`,
       },
     });
   }
 
+  // First apply field updates
   const updated = await prisma.agent.update({
     where: { id },
     data: updateData,
   });
+
+  // Recalculate score after profile update (only for claimed agents)
+  let scoreValue: number | null = updated.score;
+  let scoreRank: string | null = null;
+  if (updated.twitterHandle) {
+    const breakdown = calculateScore(updated);
+    scoreValue = breakdown.total;
+    scoreRank = getScoreRank(breakdown.total);
+    await prisma.agent.update({
+      where: { id },
+      data: { score: breakdown.total },
+    });
+  }
 
   return NextResponse.json({
     success: true,
@@ -367,6 +385,8 @@ export async function POST(
       model: updated.model ?? null,
       tokensUsed: updated.tokensUsed !== null ? Number(updated.tokensUsed) : null,
       skills: buildSkillsResponse(updated),
+      score: scoreValue ?? null,
+      rank: scoreRank ?? null,
       profileUrl: `/agents/${updated.id}`,
     },
   });
