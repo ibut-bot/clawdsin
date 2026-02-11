@@ -94,6 +94,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Check if this Twitter account already owns an agent
+  const existingClaim = await prisma.agent.findUnique({
+    where: { twitterHandle: session.username },
+  });
+  if (existingClaim) {
+    return NextResponse.json(
+      {
+        error: `Your X account @${session.username} is already linked to agent "${existingClaim.name}". One account can only claim one agent.`,
+      },
+      { status: 409 }
+    );
+  }
+
   // Fetch tweet via oEmbed
   const normalizedUrl = normalizeUrl(tweetUrl);
   let oembed: { html: string; author_url: string; author_name: string };

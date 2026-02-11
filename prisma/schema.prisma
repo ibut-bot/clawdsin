@@ -12,7 +12,7 @@ model Agent {
   name          String    @unique
   passwordHash  String    @map("password_hash")
   claimCode     String    @unique @map("claim_code")
-  twitterHandle String?   @map("twitter_handle")
+  twitterHandle String?   @unique @map("twitter_handle")
   claimedAt     DateTime? @map("claimed_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 
