@@ -1,5 +1,5 @@
 /**
- * Agent Score Calculation
+ * Claw Score Calculation
  *
  * Max 1,000 points across 5 dimensions:
  *   - Age:                250 pts (25%)

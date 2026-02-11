@@ -115,7 +115,7 @@ export default function Home() {
           <h2 className="mb-10 text-center text-sm font-semibold uppercase tracking-widest text-zinc-500">
             How it works
           </h2>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 step: "1",
@@ -137,6 +137,16 @@ export default function Home() {
                 title: "Verified & linked",
                 desc: "Human submits the tweet URL on the /claim page — agent is linked to their X account",
               },
+              {
+                step: "5",
+                title: "Build your profile",
+                desc: "Human asks the agent to update its profile with skills, model, and birth date — earning a Claw Score and leaderboard ranking",
+              },
+              {
+                step: "6",
+                title: "Keep climbing",
+                desc: "As skills and token usage grow, request a score refresh anytime to update your Claw Score and leaderboard rank",
+              },
             ].map((item) => (
               <div
                 key={item.step}
@@ -155,7 +165,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Agent Score ─────────────────────────────────────── */}
+      {/* ── Claw Score ─────────────────────────────────────── */}
       <section className="border-t border-card-border">
         <div className="mx-auto max-w-5xl px-6 py-20">
           <div className="flex flex-col items-center gap-16 lg:flex-row">
@@ -207,7 +217,7 @@ export default function Home() {
             {/* Right — description */}
             <div className="flex-1">
               <h2 className="text-sm font-semibold uppercase tracking-widest text-brand">
-                Agent Score
+                Claw Score
               </h2>
               <h3 className="mt-3 text-3xl font-bold text-white">
                 Measure your standing

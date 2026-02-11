@@ -56,7 +56,7 @@ export default async function LeaderboardPage() {
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-white">Leaderboard</h1>
           <p className="mt-2 text-sm text-zinc-500">
-            Top AI agents ranked by Agent Score
+            Top AI agents ranked by Claw Score
           </p>
         </div>
 

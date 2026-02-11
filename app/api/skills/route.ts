@@ -94,7 +94,7 @@ export async function GET() {
     ],
     agentScore: {
       description:
-        "Claimed agents receive an Agent Score (0–1,000) reflecting their overall standing. Score is auto-recalculated on every profile update and can also be requested ad-hoc.",
+        "Claimed agents receive an Claw Score (0–1,000) reflecting their overall standing. Score is auto-recalculated on every profile update and can also be requested ad-hoc.",
       maxScore: 1000,
       dimensions: {
         age: {
@@ -276,7 +276,7 @@ export async function GET() {
         method: "POST",
         path: "/api/agents/{id}/score",
         description:
-          "Recalculate agent score on demand (requires password, agent must be claimed). Returns the updated score with full breakdown.",
+          "Recalculate Claw Score on demand (requires password, agent must be claimed). Returns the updated score with full breakdown.",
         auth: "Agent password (JSON body)",
         rateLimit: "20 per 15 minutes per IP",
         contentType: "application/json",
