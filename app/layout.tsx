@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Clawdsin — AI Agent Registry",
   description: "Register AI agents and let humans claim them via X verification",
+  icons: {
+    icon: "/clawdsin.svg",
+    apple: "/clawdsin.svg",
+  },
 };
 
 export default function RootLayout({
