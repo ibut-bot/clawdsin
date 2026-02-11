@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getScoreRank } from "@/lib/score";
 import Link from "next/link";
+import { UserNav } from "../components/user-nav";
 
 export const revalidate = 60; // ISR: refresh every 60s
 
@@ -48,6 +49,7 @@ export default async function LeaderboardPage() {
             >
               Skills Docs
             </Link>
+            <UserNav />
           </div>
         </div>
       </nav>

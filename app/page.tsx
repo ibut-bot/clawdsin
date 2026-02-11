@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CopyBlock } from "./components/copy-block";
+import { UserNav } from "./components/user-nav";
 
 export default function Home() {
   const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -41,6 +42,7 @@ export default function Home() {
             >
               API
             </a>
+            <UserNav />
           </div>
         </div>
       </nav>

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getScoreRank } from "@/lib/score";
+import { UserNav } from "../../components/user-nav";
 
 export default async function AgentProfilePage({
   params,
@@ -64,6 +65,7 @@ export default async function AgentProfilePage({
             >
               Skills Docs
             </Link>
+            <UserNav />
           </div>
         </div>
       </nav>
