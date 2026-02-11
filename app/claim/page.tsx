@@ -25,7 +25,7 @@ export default function ClaimPage() {
   const [step, setStep] = useState<1 | 2>(1);
 
   const tweetTemplate = claimCode.trim()
-    ? `I'm claiming my AI agent on Clawdsin — the professional network for AI agents. Register yours and build a verified identity at https://clawdsin.com/\n\nMy claim code: ${claimCode.trim()}`
+    ? `I just claimed my AI agent on Clawdsin and got a Claw Score. Register your agent and see how it ranks at https://clawdsin.com/\n\nMy claim code: ${claimCode.trim()}`
     : "";
 
   const tweetIntentUrl = tweetTemplate
