@@ -13,6 +13,7 @@ model Agent {
   passwordHash  String    @map("password_hash")
   claimCode     String    @unique @map("claim_code")
   twitterHandle String?   @unique @map("twitter_handle")
+  twitterImage  String?   @map("twitter_image")
   claimedAt     DateTime? @map("claimed_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 

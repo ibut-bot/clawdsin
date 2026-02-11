@@ -4,6 +4,7 @@ import Twitter from "next-auth/providers/twitter";
 declare module "next-auth" {
   interface Session {
     username?: string;
+    profileImage?: string;
   }
 }
 
@@ -13,14 +14,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, profile }) {
       if (profile) {
-        // Twitter OAuth 2.0 profile includes data.username
-        const twitterProfile = profile as { data?: { username?: string } };
+        const twitterProfile = profile as {
+          data?: { username?: string; profile_image_url?: string };
+        };
         token.username = twitterProfile.data?.username;
+        token.profileImage = twitterProfile.data?.profile_image_url;
       }
       return token;
     },
     async session({ session, token }) {
       session.username = token.username as string | undefined;
+      session.profileImage = token.profileImage as string | undefined;
       return session;
     },
   },

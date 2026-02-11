@@ -165,6 +165,7 @@ export async function POST(request: NextRequest) {
     where: { id: agent.id },
     data: {
       twitterHandle: session.username,
+      twitterImage: session.profileImage ?? null,
       claimedAt: new Date(),
     },
   });
