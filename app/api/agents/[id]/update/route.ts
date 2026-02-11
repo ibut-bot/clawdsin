@@ -73,15 +73,27 @@ export async function POST(
 
   const newName = formData.get("name") as string | null;
   const imageFile = formData.get("image") as File | null;
+  const birthDateStr = formData.get("birthDate") as string | null;
+  const modelStr = formData.get("model") as string | null;
+  const tokensUsedStr = formData.get("tokensUsed") as string | null;
 
-  if (!newName && !imageFile) {
+  if (!newName && !imageFile && !birthDateStr && !modelStr && !tokensUsedStr) {
     return NextResponse.json(
-      { error: "Provide at least one field to update: name or image" },
+      { error: "Provide at least one field to update: name, image, birthDate, model, or tokensUsed" },
       { status: 400 }
     );
   }
 
-  const updateData: { name?: string; profileImage?: string } = {};
+  // Earliest allowed birth date: Nov 1, 2025 (OpenClaw agents inception)
+  const EARLIEST_BIRTH_DATE = new Date("2025-11-01T00:00:00Z");
+
+  const updateData: {
+    name?: string;
+    profileImage?: string;
+    birthDate?: Date;
+    model?: string;
+    tokensUsed?: bigint;
+  } = {};
 
   // Validate name
   if (newName) {
@@ -108,6 +120,54 @@ export async function POST(
       }
       updateData.name = trimmed;
     }
+  }
+
+  // Validate birthDate
+  if (birthDateStr) {
+    const parsed = new Date(birthDateStr);
+    if (isNaN(parsed.getTime())) {
+      return NextResponse.json(
+        { error: "birthDate must be a valid ISO 8601 date string (e.g. 2025-12-15)" },
+        { status: 400 }
+      );
+    }
+    if (parsed < EARLIEST_BIRTH_DATE) {
+      return NextResponse.json(
+        { error: "birthDate cannot be before November 2025. OpenClaw agents have existed since November 2025." },
+        { status: 400 }
+      );
+    }
+    if (parsed > new Date()) {
+      return NextResponse.json(
+        { error: "birthDate cannot be in the future" },
+        { status: 400 }
+      );
+    }
+    updateData.birthDate = parsed;
+  }
+
+  // Validate model
+  if (modelStr) {
+    const trimmedModel = modelStr.trim();
+    if (trimmedModel.length < 1 || trimmedModel.length > 100) {
+      return NextResponse.json(
+        { error: "model must be between 1 and 100 characters" },
+        { status: 400 }
+      );
+    }
+    updateData.model = trimmedModel;
+  }
+
+  // Validate tokensUsed
+  if (tokensUsedStr) {
+    const parsed = parseInt(tokensUsedStr, 10);
+    if (isNaN(parsed) || parsed < 0) {
+      return NextResponse.json(
+        { error: "tokensUsed must be a non-negative integer" },
+        { status: 400 }
+      );
+    }
+    updateData.tokensUsed = BigInt(parsed);
   }
 
   // Handle image upload
@@ -176,6 +236,9 @@ export async function POST(
         id: agent.id,
         name: agent.name,
         profileImage: agent.profileImage,
+        birthDate: agent.birthDate?.toISOString() ?? null,
+        model: agent.model ?? null,
+        tokensUsed: agent.tokensUsed !== null ? Number(agent.tokensUsed) : null,
         profileUrl: `/agents/${agent.id}`,
       },
     });
@@ -193,6 +256,9 @@ export async function POST(
       id: updated.id,
       name: updated.name,
       profileImage: updated.profileImage,
+      birthDate: updated.birthDate?.toISOString() ?? null,
+      model: updated.model ?? null,
+      tokensUsed: updated.tokensUsed !== null ? Number(updated.tokensUsed) : null,
       profileUrl: `/agents/${updated.id}`,
     },
   });

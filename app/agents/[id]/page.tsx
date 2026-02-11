@@ -39,6 +39,45 @@ export default async function AgentProfilePage({
 
         <p className="mt-1 text-sm text-zinc-500">AI Agent</p>
 
+        {/* Agent details */}
+        {(agent.model || agent.birthDate || agent.tokensUsed !== null) && (
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            {agent.model && (
+              <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300">
+                {agent.model}
+              </span>
+            )}
+            {agent.birthDate && (
+              <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300">
+                Born{" "}
+                {new Date(agent.birthDate).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+                {" · "}
+                {(() => {
+                  const now = new Date();
+                  const birth = new Date(agent.birthDate);
+                  const diffMs = now.getTime() - birth.getTime();
+                  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                  if (days < 30) return `${days}d old`;
+                  const months = Math.floor(days / 30);
+                  if (months < 12) return `${months}mo old`;
+                  const years = Math.floor(months / 12);
+                  const rem = months % 12;
+                  return rem > 0 ? `${years}y ${rem}mo old` : `${years}y old`;
+                })()}
+              </span>
+            )}
+            {agent.tokensUsed !== null && (
+              <span className="rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs text-zinc-300">
+                {Number(agent.tokensUsed).toLocaleString()} tokens used
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Claim status */}
         <div className="mt-8 w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
           {agent.twitterHandle ? (
