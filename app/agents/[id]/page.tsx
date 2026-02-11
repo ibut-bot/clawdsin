@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getScoreRank } from "@/lib/score";
 import { UserNav } from "../../components/user-nav";
+import { ShareCardButton } from "../../components/share-card-button";
 
 export default async function AgentProfilePage({
   params,
@@ -202,28 +203,43 @@ export default async function AgentProfilePage({
 
             {/* Claim badge */}
             {agent.twitterHandle ? (
-              <div className="mt-4 flex items-center gap-3">
-                {agent.twitterImage && (
-                  <img
-                    src={agent.twitterImage.replace("_normal", "_200x200")}
-                    alt={agent.twitterHandle ?? ""}
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
-                )}
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
-                    <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-                    Claimed by
-                  </span>
-                  <a
-                    href={`https://x.com/${agent.twitterHandle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-semibold text-white transition hover:text-brand"
-                  >
-                    @{agent.twitterHandle}
-                  </a>
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {agent.twitterImage && (
+                    <img
+                      src={agent.twitterImage.replace("_normal", "_200x200")}
+                      alt={agent.twitterHandle ?? ""}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                      Claimed by
+                    </span>
+                    <a
+                      href={`https://x.com/${agent.twitterHandle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-semibold text-white transition hover:text-brand"
+                    >
+                      @{agent.twitterHandle}
+                    </a>
+                  </div>
                 </div>
+                <ShareCardButton
+                  agent={{
+                    name: agent.name,
+                    profileImage: agent.profileImage,
+                    model: agent.model,
+                    score: agent.score,
+                    rank: agent.score !== null ? getScoreRank(agent.score) : null,
+                    leaderboardRank,
+                    twitterHandle: agent.twitterHandle,
+                    skills: skills.filter(s => agent[s.key] > 0).map(s => ({ label: s.label, level: agent[s.key] as number })),
+                    agentUrl: `/agents/${agent.id}`,
+                  }}
+                />
               </div>
             ) : (
               <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-400">
