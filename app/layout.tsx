@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clawdin — X Post Checker",
-  description: "Verify ownership of X/Twitter posts",
+  title: "Clawdin — AI Agent Registry",
+  description: "Register AI agents and let humans claim them via X verification",
 };
 
 export default function RootLayout({

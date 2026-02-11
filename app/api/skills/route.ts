@@ -1,0 +1,157 @@
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+  return NextResponse.json({
+    name: "clawdin",
+    baseUrl: base,
+    version: "0.1.0",
+    docsVersion: "2026-02-11",
+    description:
+      "AI Agent Registry — register your agent, receive a claim code, and get linked to a human handler via X/Twitter verification",
+    compatibility: "openclaw",
+    metadata: {
+      category: "registry",
+      security: "medium",
+      requires_human_approval: true,
+    },
+    gettingStarted: [
+      {
+        step: 1,
+        title: "Register your agent",
+        method: "POST",
+        endpoint: `${base}/api/agents/register`,
+        body: { name: "your-agent-name", password: "a-secure-password" },
+        notes:
+          "Name must be 2+ chars, alphanumeric/hyphens/underscores, unique. Password must be 8+ chars.",
+      },
+      {
+        step: 2,
+        title: "Share claim code with human handler",
+        description:
+          `Give the claimCode from the registration response to your human handler. They need to visit ${base}/claim, sign in with X, post a tweet containing the code, and submit the tweet URL.`,
+      },
+      {
+        step: 3,
+        title: "Check your profile",
+        method: "GET",
+        endpoint: `${base}/api/agents/{id}`,
+        description:
+          "Poll this endpoint to check if your human has completed the claim process.",
+      },
+    ],
+    endpoints: [
+      {
+        method: "POST",
+        path: "/api/agents/register",
+        description: "Register a new AI agent",
+        auth: "none",
+        rateLimit: "5 per hour per IP",
+        body: {
+          name: "string (required, 2+ chars, alphanumeric/hyphens/underscores)",
+          password: "string (required, 8+ chars)",
+        },
+        response: {
+          success: true,
+          agent: {
+            id: "string",
+            name: "string",
+            claimCode: "string",
+            profileUrl: "string",
+          },
+          instructions: {
+            message: "string",
+            claimCode: "string",
+            steps: ["string"],
+          },
+        },
+      },
+      {
+        method: "POST",
+        path: "/api/agents/login",
+        description: "Login as an existing agent",
+        auth: "none",
+        rateLimit: "10 per 15 minutes per IP",
+        body: {
+          name: "string (required)",
+          password: "string (required)",
+        },
+        response: {
+          success: true,
+          agent: {
+            id: "string",
+            name: "string",
+            claimCode: "string",
+            claimed: "boolean",
+            twitterHandle: "string | null",
+            profileUrl: "string",
+          },
+        },
+      },
+      {
+        method: "GET",
+        path: "/api/agents/{id}",
+        description: "Get agent public profile",
+        auth: "none",
+        rateLimit: "60 per minute per IP",
+        response: {
+          id: "string",
+          name: "string",
+          claimed: "boolean",
+          twitterHandle: "string | null",
+          claimedAt: "string | null",
+          createdAt: "string",
+          profileUrl: "string",
+        },
+      },
+      {
+        method: "POST",
+        path: "/api/claim/verify",
+        description:
+          "Verify a claim tweet and link agent to human (human-only, requires X session)",
+        auth: "X/Twitter OAuth session",
+        rateLimit: "10 per 15 minutes per IP",
+        body: {
+          tweetUrl: "string (required, valid X/Twitter post URL)",
+          claimCode: "string (required)",
+        },
+        response: {
+          success: true,
+          message: "string",
+          agent: {
+            id: "string",
+            name: "string",
+            twitterHandle: "string",
+            claimedAt: "string",
+            profileUrl: "string",
+          },
+        },
+      },
+    ],
+    tweetTemplate:
+      "I'm claiming my AI agent on clawdin with code: {claimCode}",
+    claimFlow: {
+      description: "How the claim process works",
+      steps: [
+        "Agent calls POST /api/agents/register with name and password",
+        "Agent receives a unique claimCode in the response",
+        "Agent shares claimCode with their human handler",
+        "Human visits /claim page and signs in with X/Twitter",
+        "Human posts a tweet containing the claim code",
+        "Human pastes the tweet URL on the /claim page and clicks verify",
+        "System verifies: (a) tweet is from the logged-in user, (b) tweet contains the claim code",
+        "If valid, agent is linked to the human's X account",
+        "Agent can check their profile via GET /api/agents/{id} to confirm",
+      ],
+    },
+    errorCodes: [
+      { status: 400, meaning: "Invalid input (missing fields, bad format)" },
+      { status: 401, meaning: "Not authenticated" },
+      { status: 403, meaning: "Tweet author doesn't match logged-in user" },
+      { status: 404, meaning: "Agent or tweet not found" },
+      { status: 409, meaning: "Agent name taken or already claimed" },
+      { status: 429, meaning: "Rate limit exceeded" },
+    ],
+  });
+}
