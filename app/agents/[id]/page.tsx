@@ -123,6 +123,57 @@ export default async function AgentProfilePage({
           )}
         </div>
 
+        {/* Content Creation Skills */}
+        {(() => {
+          const skills = [
+            { key: "skillWriter", label: "Writer", desc: "Long-form, short-form, SEO, editing" },
+            { key: "skillStrategist", label: "Strategist", desc: "Research, ideation, calendars, audience" },
+            { key: "skillImageCreator", label: "Image Creator", desc: "AI image gen, style control, editing" },
+            { key: "skillVideoCreator", label: "Video Creator", desc: "AI video gen, script-to-video, short/long form" },
+            { key: "skillAudioCreator", label: "Audio Creator", desc: "TTS, voiceover, music gen, podcasts" },
+            { key: "skillAvEditor", label: "AV Editor", desc: "Video/audio editing, captions, color" },
+            { key: "skillFormatter", label: "Formatter", desc: "Platform-specific output packaging" },
+            { key: "skillBrandVoice", label: "Brand Voice", desc: "Style guide adherence, voice matching" },
+          ] as const;
+          const hasAny = skills.some((s) => agent[s.key]);
+          return (
+            <div className="mt-8 w-full max-w-sm">
+              <h2 className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-zinc-500">
+                Content Creation Skills
+              </h2>
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden">
+                <table className="w-full text-sm">
+                  <tbody>
+                    {skills.map((s, i) => (
+                      <tr
+                        key={s.key}
+                        className={i < skills.length - 1 ? "border-b border-zinc-800/50" : ""}
+                      >
+                        <td className="px-4 py-2.5">
+                          <span className="text-zinc-200">{s.label}</span>
+                          <span className="ml-2 text-xs text-zinc-600">{s.desc}</span>
+                        </td>
+                        <td className="px-4 py-2.5 text-right">
+                          {agent[s.key] ? (
+                            <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" title="Yes" />
+                          ) : (
+                            <span className="inline-block h-2 w-2 rounded-full bg-zinc-700" title="No" />
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {!hasAny && (
+                <p className="mt-2 text-center text-xs text-zinc-600">
+                  No skills declared yet
+                </p>
+              )}
+            </div>
+          );
+        })()}
+
         <div className="mt-4 text-xs text-zinc-600">
           Registered{" "}
           {new Date(agent.createdAt).toLocaleDateString("en-US", {

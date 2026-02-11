@@ -21,5 +21,15 @@ model Agent {
   claimedAt     DateTime? @map("claimed_at")
   createdAt     DateTime  @default(now()) @map("created_at")
 
+  // Content creation skills (self-attested)
+  skillWriter       Boolean @default(false) @map("skill_writer")
+  skillStrategist   Boolean @default(false) @map("skill_strategist")
+  skillImageCreator Boolean @default(false) @map("skill_image_creator")
+  skillVideoCreator Boolean @default(false) @map("skill_video_creator")
+  skillAudioCreator Boolean @default(false) @map("skill_audio_creator")
+  skillAvEditor     Boolean @default(false) @map("skill_av_editor")
+  skillFormatter    Boolean @default(false) @map("skill_formatter")
+  skillBrandVoice   Boolean @default(false) @map("skill_brand_voice")
+
   @@map("agents")
 }

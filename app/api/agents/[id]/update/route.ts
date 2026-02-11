@@ -77,9 +77,23 @@ export async function POST(
   const modelStr = formData.get("model") as string | null;
   const tokensUsedStr = formData.get("tokensUsed") as string | null;
 
-  if (!newName && !imageFile && !birthDateStr && !modelStr && !tokensUsedStr) {
+  // Content creation skill fields
+  const skillFields = [
+    "skillWriter", "skillStrategist", "skillImageCreator", "skillVideoCreator",
+    "skillAudioCreator", "skillAvEditor", "skillFormatter", "skillBrandVoice",
+  ] as const;
+  const skillUpdates: Record<string, boolean> = {};
+  for (const field of skillFields) {
+    const val = formData.get(field) as string | null;
+    if (val !== null) {
+      skillUpdates[field] = val === "true" || val === "1";
+    }
+  }
+  const hasSkillUpdates = Object.keys(skillUpdates).length > 0;
+
+  if (!newName && !imageFile && !birthDateStr && !modelStr && !tokensUsedStr && !hasSkillUpdates) {
     return NextResponse.json(
-      { error: "Provide at least one field to update: name, image, birthDate, model, or tokensUsed" },
+      { error: "Provide at least one field to update: name, image, birthDate, model, tokensUsed, or skill fields (skillWriter, skillStrategist, skillImageCreator, skillVideoCreator, skillAudioCreator, skillAvEditor, skillFormatter, skillBrandVoice)" },
       { status: 400 }
     );
   }
@@ -93,7 +107,18 @@ export async function POST(
     birthDate?: Date;
     model?: string;
     tokensUsed?: bigint;
+    skillWriter?: boolean;
+    skillStrategist?: boolean;
+    skillImageCreator?: boolean;
+    skillVideoCreator?: boolean;
+    skillAudioCreator?: boolean;
+    skillAvEditor?: boolean;
+    skillFormatter?: boolean;
+    skillBrandVoice?: boolean;
   } = {};
+
+  // Apply skill updates
+  Object.assign(updateData, skillUpdates);
 
   // Validate name
   if (newName) {
@@ -228,6 +253,17 @@ export async function POST(
     }
   }
 
+  const buildSkillsResponse = (a: typeof agent) => ({
+    writer: a.skillWriter,
+    strategist: a.skillStrategist,
+    imageCreator: a.skillImageCreator,
+    videoCreator: a.skillVideoCreator,
+    audioCreator: a.skillAudioCreator,
+    avEditor: a.skillAvEditor,
+    formatter: a.skillFormatter,
+    brandVoice: a.skillBrandVoice,
+  });
+
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json({
       success: true,
@@ -239,6 +275,7 @@ export async function POST(
         birthDate: agent.birthDate?.toISOString() ?? null,
         model: agent.model ?? null,
         tokensUsed: agent.tokensUsed !== null ? Number(agent.tokensUsed) : null,
+        skills: buildSkillsResponse(agent),
         profileUrl: `/agents/${agent.id}`,
       },
     });
@@ -259,6 +296,7 @@ export async function POST(
       birthDate: updated.birthDate?.toISOString() ?? null,
       model: updated.model ?? null,
       tokensUsed: updated.tokensUsed !== null ? Number(updated.tokensUsed) : null,
+      skills: buildSkillsResponse(updated),
       profileUrl: `/agents/${updated.id}`,
     },
   });
