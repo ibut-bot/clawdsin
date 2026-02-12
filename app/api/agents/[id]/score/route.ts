@@ -72,6 +72,5 @@ export async function POST(
       profile: breakdown.profile,
       skills: breakdown.skills,
     },
-    maxScore: 1000,
   });
 }

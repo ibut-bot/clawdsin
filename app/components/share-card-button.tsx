@@ -13,31 +13,59 @@ interface AgentData {
   twitterHandle: string | null;
   skills: { label: string; level: number }[];
   agentUrl: string;
+  birthDate: string | null;
+  tokensUsed: number | null;
+}
+
+async function toDataUrl(url: string): Promise<string | null> {
+  try {
+    const proxyUrl = `/api/image-proxy?url=${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
 }
 
 export function ShareCardButton({ agent }: { agent: AgentData }) {
   const [open, setOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(agent.profileImage);
 
   const topSkills = agent.skills
     .filter((s) => s.level > 0)
     .sort((a, b) => b.level - a.level)
     .slice(0, 4);
 
-  async function handleDownload() {
+  async function renderCard(): Promise<Blob> {
+    const canvas = await html2canvas(cardRef.current!, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true,
+    });
+    return new Promise((resolve) =>
+      canvas.toBlob((blob) => resolve(blob!), "image/png")
+    );
+  }
+
+  async function handleCopy() {
     if (!cardRef.current) return;
     setDownloading(true);
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true,
-      });
-      const link = document.createElement("a");
-      link.download = `${agent.name}-clawdsin.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+      const blob = await renderCard();
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } finally {
       setDownloading(false);
     }
@@ -54,7 +82,14 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          if (agent.profileImage) {
+            toDataUrl(agent.profileImage).then((data) => {
+              if (data) setAvatarSrc(data);
+            });
+          }
+        }}
         className="inline-flex items-center gap-2 rounded-lg border border-card-border bg-card px-4 py-2 text-sm font-medium text-zinc-300 transition hover:border-brand/50 hover:text-white"
       >
         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -88,7 +123,7 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
                 ref={cardRef}
                 style={{
                   width: 480,
-                  padding: 32,
+                  padding: "20px 32px 32px 32px",
                   background: "linear-gradient(145deg, #09090b 0%, #18181b 50%, #09090b 100%)",
                   borderRadius: 16,
                   border: "1px solid #27272a",
@@ -98,11 +133,10 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
                 {/* Top row: avatar + name + score */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    {agent.profileImage ? (
+                    {avatarSrc ? (
                       <img
-                        src={agent.profileImage}
+                        src={avatarSrc}
                         alt=""
-                        crossOrigin="anonymous"
                         style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", border: "2px solid #3f3f46" }}
                       />
                     ) : (
@@ -182,6 +216,70 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
                   </div>
                 )}
 
+                {/* Stats row: age + tokens */}
+                {(agent.birthDate || agent.tokensUsed !== null) && (
+                  <div
+                    style={{
+                      marginTop: 16,
+                      display: "flex",
+                      gap: 12,
+                    }}
+                  >
+                    {agent.birthDate && (() => {
+                      const now = new Date();
+                      const birth = new Date(agent.birthDate);
+                      const days = Math.floor((now.getTime() - birth.getTime()) / (1000 * 60 * 60 * 24));
+                      let ageLabel: string;
+                      if (days < 30) ageLabel = `${days}d`;
+                      else {
+                        const months = Math.floor(days / 30);
+                        if (months < 12) ageLabel = `${months}mo`;
+                        else {
+                          const years = Math.floor(months / 12);
+                          const rem = months % 12;
+                          ageLabel = rem > 0 ? `${years}y ${rem}mo` : `${years}y`;
+                        }
+                      }
+                      return (
+                        <div
+                          style={{
+                            flex: 1,
+                            background: "#1a1a1e",
+                            borderRadius: 10,
+                            padding: "10px 14px",
+                            border: "1px solid #27272a",
+                          }}
+                        >
+                          <div style={{ fontSize: 10, fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: 1 }}>
+                            Age
+                          </div>
+                          <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginTop: 2 }}>
+                            {ageLabel}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    {agent.tokensUsed !== null && (
+                      <div
+                        style={{
+                          flex: 1,
+                          background: "#1a1a1e",
+                          borderRadius: 10,
+                          padding: "10px 14px",
+                          border: "1px solid #27272a",
+                        }}
+                      >
+                        <div style={{ fontSize: 10, fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: 1 }}>
+                          Tokens
+                        </div>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginTop: 2 }}>
+                          {agent.tokensUsed.toLocaleString()}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Skills */}
                 {topSkills.length > 0 && (
                   <div style={{ marginTop: 20 }}>
@@ -234,14 +332,28 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
             {/* Actions */}
             <div className="flex gap-3">
               <button
-                onClick={handleDownload}
+                onClick={handleCopy}
                 disabled={downloading}
-                className="flex-1 rounded-lg border border-card-border bg-card px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-card-border bg-card px-4 py-2.5 text-sm font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:opacity-50"
               >
-                {downloading ? "Generating…" : "Download Image"}
+                {copied ? (
+                  <>
+                    <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Copied!
+                  </>
+                ) : downloading ? "Copying…" : (
+                  <>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    Copy Image
+                  </>
+                )}
               </button>
               <button
-                onClick={() => { handleDownload(); handlePostOnX(); }}
+                onClick={async () => { await handleCopy(); handlePostOnX(); }}
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -252,7 +364,7 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
             </div>
 
             <p className="text-center text-xs text-zinc-600">
-              Download the card and attach it to your post for best results
+              Image is copied to clipboard — paste it directly into your post
             </p>
           </div>
         </div>

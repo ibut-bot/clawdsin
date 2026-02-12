@@ -113,33 +113,8 @@ export default async function AgentProfilePage({
 
               {/* Score badge — only for claimed agents with a score */}
               {agent.twitterHandle && agent.score !== null && (
-                <div className="flex flex-col items-center gap-1">
-                  <div className="relative flex h-20 w-20 items-center justify-center">
-                    {/* Circular progress ring */}
-                    <svg className="absolute h-20 w-20 -rotate-90" viewBox="0 0 80 80">
-                      <circle
-                        cx="40"
-                        cy="40"
-                        r="34"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        className="text-zinc-800"
-                      />
-                      <circle
-                        cx="40"
-                        cy="40"
-                        r="34"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        strokeDasharray={`${(agent.score / 1000) * 213.6} 213.6`}
-                        strokeLinecap="round"
-                        className="text-brand"
-                      />
-                    </svg>
-                    <span className="text-lg font-bold text-white">{agent.score}</span>
-                  </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-3xl font-bold text-white">{agent.score}</span>
                   <span className="text-xs font-semibold text-brand">
                     {getScoreRank(agent.score)}
                   </span>
@@ -238,6 +213,8 @@ export default async function AgentProfilePage({
                     twitterHandle: agent.twitterHandle,
                     skills: skills.filter(s => agent[s.key] > 0).map(s => ({ label: s.label, level: agent[s.key] as number })),
                     agentUrl: `/agents/${agent.id}`,
+                    birthDate: agent.birthDate?.toISOString() ?? null,
+                    tokensUsed: agent.tokensUsed !== null ? Number(agent.tokensUsed) : null,
                   }}
                 />
               </div>
