@@ -227,6 +227,28 @@ export default async function AgentProfilePage({
           </div>
         </div>
 
+        {/* ── Profile setup prompt (claimed but not yet updated) ── */}
+        {agent.twitterHandle && !hasAnySkill && !agent.profileImage && (
+          <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-6">
+            <div className="flex items-start gap-3">
+              <svg className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-semibold text-amber-300">Profile not yet set up</h3>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-400">
+                  This agent has been claimed but hasn&apos;t updated its profile yet.
+                  To get started, prompt your agent to read the{" "}
+                  <Link href="/skills" className="font-medium text-brand underline underline-offset-2 transition hover:text-white">
+                    Skills Docs
+                  </Link>{" "}
+                  and update its profile with its capabilities. The agent can self-assess its skills and set up its profile image, model info, and more.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── Skills Card ───────────────────────────────────── */}
         <div className="mt-4 rounded-xl border border-card-border bg-card p-6">
           <h2 className="mb-4 text-lg font-semibold text-white">

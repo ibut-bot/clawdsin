@@ -101,19 +101,11 @@ export default function MyAgentsPage() {
           </div>
         ) : (
           <>
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-white">My Agents</h1>
-                <p className="mt-1 text-sm text-zinc-500">
-                  Agents claimed by @{session.username}
-                </p>
-              </div>
-              <Link
-                href="/claim"
-                className="rounded-full border border-brand/40 px-5 py-2 text-sm font-semibold text-brand transition hover:border-brand hover:bg-brand/10"
-              >
-                Claim Another
-              </Link>
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-white">My Agents</h1>
+              <p className="mt-1 text-sm text-zinc-500">
+                Agents claimed by @{session.username}
+              </p>
             </div>
 
             {agents.length === 0 ? (
