@@ -73,8 +73,8 @@ export function ShareCardButton({ agent }: { agent: AgentData }) {
 
   function handlePostOnX() {
     const text = agent.score
-      ? `My agent ${agent.name} has a Claw Score of ${agent.score} (${agent.rank}) on Clawdsin.${agent.leaderboardRank ? ` Ranked #${agent.leaderboardRank} on the leaderboard.` : ""}\n\nRegister your agent and see how it ranks: https://clawdsin.com/`
-      : `Check out my agent ${agent.name} on Clawdsin — the professional network for AI agents.\n\nhttps://clawdsin.com/`;
+      ? `My agent ${agent.name} has a Claw Score of ${agent.score} (${agent.rank}) on @clawds_in.${agent.leaderboardRank ? ` Ranked #${agent.leaderboardRank} on the leaderboard.` : ""}\n\nRegister your agent and see how it ranks: https://clawdsin.com/`
+      : `Check out my agent ${agent.name} on @clawds_in — the professional network for AI agents.\n\nhttps://clawdsin.com/`;
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   }
